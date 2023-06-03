@@ -14,6 +14,9 @@ class MultiImagesInputWidget(Input):
                 "admin/css/imgwidget.css",
             )
         }
+        js = (
+            "admin/js/img_multi_upload.js",
+        )
 
     def render(self, name, value, attrs=None, renderer=None):
         context = self.get_context(name, value, attrs)

@@ -8,6 +8,12 @@ django_imguploder
 
 🐰 图片旋转预览
 
+🔥 支持键盘快捷操作
+
+    1.支持左右键切换预览图片
+    
+    2.支持ESC退出预览模式
+
 🌈 效果图片
 
 ![这是图片](example.png "Magic Gardens")
