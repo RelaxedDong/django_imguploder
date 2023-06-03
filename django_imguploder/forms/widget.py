@@ -11,7 +11,7 @@ class MultiImagesInputWidget(Input):
     class Media:
         css = {
             "all": (
-                "css/imgwidget.css",
+                "admin/css/imgwidget.css",
             )
         }
 

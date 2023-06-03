@@ -1,11 +1,11 @@
 {% load static %}
 <html>
 <head>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'admin/js/jquery.min.js' %}"></script>
 </head>
 <body>
 <div class="file-button" id="upload_image_{{ widget.name }}"
-     style="background-image:  url('{% static 'imgs/add.png' %}');">
+     style="background-image:  url('{% static 'admin/imgs/add.png' %}');">
     <input type="{{ widget.type }}"
            data-widgetname="{{ widget.name }}"
            onchange="uploadImage(this)"
@@ -22,6 +22,25 @@
     function show_big_img(obj) {
         imgShow("#outerdiv", "#innerdiv", "#bigimg", obj);
     }
+
+    function getRotate(_this, index) {
+        var degree = (_this.data('rotate') || 0) - 90;
+        _this.css('transform', 'rotate(' + degree + 'deg)');
+        _this.css('-ms-transform', 'rotate(' + degree + 'deg)');
+        _this.css('-webkit-transform', 'rotate(' + degree + 'deg)');
+        _this.css('-moz-transform', 'rotate(' + degree + 'deg)');
+        _this.data('rotate', degree);
+    }
+
+    $("#bigimg").click(function () {//再次点击淡出消失弹出层
+        getRotate($("#bigimg"), 1);
+        return false;
+    });
+    $("#outerdiv").click(function () {//再次点击淡出消失弹出层
+        $(this).fadeOut("fast");
+        return false;
+    });
+
     function imgShow(outerdiv, innerdiv, bigimg, obj) {
         var src = obj.src;//获取当前点击的pimg元素中的src属性
         $(bigimg).attr("src", src);//设置#bigimg元素的src属性
@@ -30,7 +49,7 @@
         var realWidth = obj.naturalWidth;//获取图片真实宽度
         var realHeight = obj.naturalHeight;//获取图片真实高度
         var imgWidth, imgHeight;
-        var scale = 1;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+        var scale = 0.9;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
         if (realHeight > windowH * scale) {//判断图片高度
             imgHeight = windowH * scale;//如大于窗口高度，图片高度进行缩放
             imgWidth = imgHeight / realHeight * realWidth;//等比例缩放宽度
@@ -49,10 +68,6 @@
         var h = (windowH - imgHeight) / 2;//计算图片与窗口上边距
         $(innerdiv).css({"top": h, "left": w});//设置#innerdiv的top和left属性
         $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
-
-        $(outerdiv).click(function () {//再次点击淡出消失弹出层
-            $(this).fadeOut("fast");
-        });
     }
 
     function updateTextareaValue(widget_name) {
@@ -62,7 +77,6 @@
             imageUrls.push(imgUrl);
         });
         $('#' + widget_name).val(imageUrls);
-        console.log(widget_name, imageUrls)
     }
 
     function add_selected_img(src, widget_name) {
