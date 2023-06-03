@@ -1,0 +1,130 @@
+{% load static %}
+<html>
+<head>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+</head>
+<body>
+<div class="file-button" id="upload_image_{{ widget.name }}"
+     style="background-image:  url('{% static 'imgs/add.png' %}');">
+    <input type="{{ widget.type }}"
+           data-widgetname="{{ widget.name }}"
+           onchange="uploadImage(this)"
+           accept="image/*"
+           multiple>
+    <textarea id="{{ widget.name }}" name="{{ widget.name }}" style="display: none"></textarea>
+    <div id="outerdiv" class="big-img-box">
+        <div id="innerdiv" style="position:absolute;">
+            <img id="bigimg" src="" alt="大图"/></div>
+    </div>
+</div>
+<script type="text/javascript">
+    //因为图片是动态添加的，所以不能使用选择器选择。
+    function show_big_img(obj) {
+        imgShow("#outerdiv", "#innerdiv", "#bigimg", obj);
+    }
+    function imgShow(outerdiv, innerdiv, bigimg, obj) {
+        var src = obj.src;//获取当前点击的pimg元素中的src属性
+        $(bigimg).attr("src", src);//设置#bigimg元素的src属性
+        var windowW = $(window).width();//获取当前窗口宽度
+        var windowH = $(window).height();//获取当前窗口高度
+        var realWidth = obj.naturalWidth;//获取图片真实宽度
+        var realHeight = obj.naturalHeight;//获取图片真实高度
+        var imgWidth, imgHeight;
+        var scale = 1;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+        if (realHeight > windowH * scale) {//判断图片高度
+            imgHeight = windowH * scale;//如大于窗口高度，图片高度进行缩放
+            imgWidth = imgHeight / realHeight * realWidth;//等比例缩放宽度
+            if (imgWidth > windowW * scale) {//如宽度扔大于窗口宽度
+                imgWidth = windowW * scale;//再对宽度进行缩放
+            }
+        } else if (realWidth > windowW * scale) {//如图片高度合适，判断图片宽度
+            imgWidth = windowW * scale;//如大于窗口宽度，图片宽度进行缩放
+            imgHeight = imgWidth / realWidth * realHeight;//等比例缩放高度
+        } else {//如果图片真实高度和宽度都符合要求，高宽不变
+            imgWidth = realWidth;
+            imgHeight = realHeight;
+        }
+        $(bigimg).css("width", imgWidth);//以最终的宽度对图片缩放
+        var w = (windowW - imgWidth) / 2;//计算图片与窗口左边距
+        var h = (windowH - imgHeight) / 2;//计算图片与窗口上边距
+        $(innerdiv).css({"top": h, "left": w});//设置#innerdiv的top和left属性
+        $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
+
+        $(outerdiv).click(function () {//再次点击淡出消失弹出层
+            $(this).fadeOut("fast");
+        });
+    }
+
+    function updateTextareaValue(widget_name) {
+        var imageUrls = [];
+        $('.' + widget_name + '_values').each(function () {
+            var imgUrl = $(this).attr('src');
+            imageUrls.push(imgUrl);
+        });
+        $('#' + widget_name).val(imageUrls);
+        console.log(widget_name, imageUrls)
+    }
+
+    function add_selected_img(src, widget_name) {
+        $("#upload_image_" + widget_name).before("<div class=\"selected-img\">\n" +
+            "    <i class=\"iconfont icon-delete delete_icon_image\" data-widgetname=\"" + widget_name + "\" title=\"删除图片\" onclick='delete_img(this)'></i>\n" +
+            "    <img class=\"" + widget_name + "_values cover_image\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"待选图片\" onclick='show_big_img(this)'>\n" +
+            "</div>");
+        updateTextareaValue(widget_name);
+    }
+
+    var model_image_list = '{{ widget.widget_img_urls }}'.split(",")
+    if (model_image_list[0] !== '') {
+        if (model_image_list.length > 0) {
+            for (let i = 0; i < model_image_list.length; i++) {
+                add_selected_img(model_image_list[i], "{{ widget.name }}");
+            }
+        }
+    }
+
+    function delete_img(e) {
+        var name = $(e).data('widgetname');
+        $(e).closest('.selected-img').remove();
+        updateTextareaValue(name);
+    }
+
+    function uploadImage(obj) {
+        var name = $(obj).data('widgetname');
+        let i;
+        var formData = new FormData();
+        var files = $(obj)[0].files;//获取模板定义的图片上传按钮的文件
+        for (i = 0; i < files.length; i++) {
+            var ext = files[i].name.slice(files[i].name.lastIndexOf(".") + 1).toLowerCase();
+            if ("png" === ext || "jpg" === ext || "jpeg" === ext || "gif" === ext) {
+                formData.append(files[i].name, files[i]);
+            }
+        }
+        if (formData) {
+            //必须加上csrftoken ，否则验证不通过，ajax请求无效
+            $.ajax({
+                url: '{% url 'upload_image' %}',
+                dataType: 'json',// 返回值类型 一般设置为json
+                type: 'POST',
+                processData: false,
+                contentType: false,
+                data: formData,
+                async: false,
+                success: function (resp) {
+                    //动态添加HTML元素，显示上传的图片
+                    if (resp.code === 200) {
+                        var reuslt_image = resp.data.image_list;
+                        for (i = 0; i < reuslt_image.length; i++) {
+                            add_selected_img(reuslt_image[i], name);
+                        }
+                        $(obj).val("");
+                    }
+                },
+                error: function (error) {
+                    alert("上传图片失败", error);
+                }
+            })
+        }
+    }
+</script>
+</body>
+</html>

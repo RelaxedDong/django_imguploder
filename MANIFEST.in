@@ -1,0 +1,4 @@
+include README.md
+recursive-include django_imguploder *
+recursive-include django_imguploder/static *
+recursive-include django_imguploder/templates *
