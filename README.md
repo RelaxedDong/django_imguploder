@@ -6,6 +6,15 @@ django_imguploder
 
 ✨ 图片大图预览、删除
 
+🌈 效果图片
+
+![这是图片](example.png "Magic Gardens")
+
+安装
+-----
+`pip install django-imgwidget`
+
+`主页: https://pypi.org/project/django-imgwidget`
 
 步骤
 -----

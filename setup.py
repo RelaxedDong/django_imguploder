@@ -6,7 +6,7 @@ long_description = "\n".join([
 ])
 
 NAME = 'django-imgwidget'
-VERSION = '0.0.1'
+VERSION = '0.0.2'
 
 setup(
     name=NAME,
@@ -17,10 +17,11 @@ setup(
     zip_safe=False,
     include_package_data=True,
     keywords='django,admin,widget,image,uploader',
-    url='https://github.com/RelaxedDong/simpleui',
+    url='https://github.com/RelaxedDong/django_imguploder',
     license='Apache License 2.0',
     author='donghao',
     long_description=long_description,
+    long_description_content_type="text/markdown",  # 描述文档README的格式 一般md
     author_email='1417766861@qq.com',
     description='上传图片组件',
     install_requires=['django'],
