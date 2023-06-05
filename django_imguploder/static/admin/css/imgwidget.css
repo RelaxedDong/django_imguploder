@@ -98,3 +98,7 @@ i:hover {
 #bigimg {
     border: 5px solid #fff;
 }
+
+.selected-img img {
+    width: 100%;
+}

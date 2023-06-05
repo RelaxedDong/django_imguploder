@@ -6,7 +6,7 @@ long_description = "\n".join([
 ])
 
 NAME = 'django-imgwidget'
-VERSION = '0.0.2.3'
+VERSION = '0.0.2.4'
 
 setup(
     name=NAME,
