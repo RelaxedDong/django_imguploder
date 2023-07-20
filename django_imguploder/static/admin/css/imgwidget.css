@@ -9,11 +9,15 @@
     border-radius: 10px;
     margin-right: 10px;
 }
-
+.widget_imgs{
+    width: 100%;
+    height: 100%;
+}
 /*缩略图片聚焦样式*/
 .selected-img:hover {
     cursor: pointer;
 }
+
 
 /*上传图片按钮样式*/
 .file-button {
@@ -97,8 +101,4 @@ i:hover {
 
 #bigimg {
     border: 5px solid #fff;
-}
-
-.selected-img img {
-    width: 100%;
 }
