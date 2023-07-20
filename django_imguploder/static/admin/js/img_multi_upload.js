@@ -1,7 +1,7 @@
 function add_selected_img(src, widget_name) {
     $("#upload_image_" + widget_name).before("<div class=\"selected-img\">\n" +
         "    <i class=\"iconfont icon-delete delete_icon_image\" data-widgetname=\"" + widget_name + "\" title=\"删除图片\" onclick='delete_img(this)'></i>\n" +
-        "    <img class=\"" + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"待选图片\" onclick='show_big_img(this)'>\n" +
+        "    <img class=\"widget_imgs " + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"待选图片\" onclick='show_big_img(this)'>\n" +
         "</div>");
     updateTextareaValue(widget_name);
 }
