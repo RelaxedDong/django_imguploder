@@ -1,21 +1,17 @@
 {% load static %}
-<html>
-<head>
-    <script src="{% static 'admin/js/jquery.min.js' %}"></script>
-</head>
-<body>
-<div class="file-button" id="upload_image_{{ widget.name }}"
-     style="background-image:  url('{% static 'admin/imgs/add.png' %}');">
-    <input type="{{ widget.type }}"
+<div class="file-button addlink" id="upload_image_{{ widget.name }}">
+    <input type="{{ input_type }}"
            data-widgetname="{{ widget.name }}"
            onchange="uploadImage(this)"
-           accept="image/*"
-           multiple>
-    <textarea id="{{ widget.name }}" name="{{ widget.name }}" style="display: none"></textarea>
-    <div id="outerdiv" class="big-img-box">
-        <div id="innerdiv" style="position:absolute;">
-            <img id="bigimg" src="" alt="大图"/></div>
-    </div>
+           {% if multiple %}
+           multiple
+           {% endif %}
+           accept="{{ accept }}">
+</div>
+<textarea id="{{ widget.name }}" name="{{ widget.name }}" style="display: none"></textarea>
+<div id="outerdiv" class="big-img-box">
+    <div id="innerdiv" style="position:absolute;">
+        <img id="bigimg" src="" alt="大图"/></div>
 </div>
 <script type="text/javascript">
     function uploadImage(obj) {
@@ -23,6 +19,12 @@
         let i;
         var formData = new FormData();
         var files = $(obj)[0].files;//获取模板定义的图片上传按钮的文件
+
+        let selectedImgs = $('.' + name + '_values')
+        if ({{ max_count }} > 0 && selectedImgs.length + files.length > {{ max_count }}) {
+            alert("图片最多选择" + {{ max_count }} + "张图片")
+            return
+        }
         for (i = 0; i < files.length; i++) {
             var ext = files[i].name.slice(files[i].name.lastIndexOf(".") + 1).toLowerCase();
             if ("png" === ext || "jpg" === ext || "jpeg" === ext || "gif" === ext) {
@@ -44,7 +46,7 @@
                     if (resp.code === 200) {
                         var reuslt_image = resp.data.image_list;
                         for (i = 0; i < reuslt_image.length; i++) {
-                            add_selected_img(reuslt_image[i], name);
+                            add_selected_img(reuslt_image[i], name, {{max_count}});
                         }
                         $(obj).val("");
                     }
@@ -61,12 +63,10 @@
         if (model_image_list[0] !== '') {
             if (model_image_list.length > 0) {
                 for (let i = 0; i < model_image_list.length; i++) {
-                    add_selected_img(model_image_list[i], "{{ widget.name }}");
+                    add_selected_img(model_image_list[i], "{{ widget.name }}", "{{ max_count }}");
                 }
             }
         }
     })
 
 </script>
-</body>
-</html>

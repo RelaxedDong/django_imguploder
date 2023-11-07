@@ -1,10 +1,11 @@
-function add_selected_img(src, widget_name) {
+function add_selected_img(src, widget_name, max_count) {
     $("#upload_image_" + widget_name).before("<div class=\"selected-img\">\n" +
-        "    <i class=\"iconfont icon-delete delete_icon_image\" data-widgetname=\"" + widget_name + "\" title=\"删除图片\" onclick='delete_img(this)'></i>\n" +
+        "    <div class=\"deletelink delete_icon_image\" data-maxcount=\"" + max_count + "\" data-widgetname=\"" + widget_name + "\" title=\"删除图片\" onclick='delete_img(this)'></div>\n" +
         "    <img class=\"widget_imgs " + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"待选图片\" onclick='show_big_img(this)'>\n" +
         "</div>");
-    updateTextareaValue(widget_name);
+    updateTextareaValue(widget_name, max_count);
 }
+
 
 function getRotate(_this, index) {
     var degree = (_this.data('rotate') || 0) - 90;
@@ -43,13 +44,18 @@ function imgShow(outerdiv, innerdiv, bigimg, obj) {
     set_big_img_degree(0);
 }
 
-function updateTextareaValue(widget_name) {
+function updateTextareaValue(widget_name, maxcount) {
     var imageUrls = [];
     $('.' + widget_name + '_values').each(function () {
         var imgUrl = $(this).attr('src');
         imageUrls.push(imgUrl);
     });
     $('#' + widget_name).val(imageUrls);
+    if (imageUrls.length === maxcount) {
+        $("#upload_image_" + widget_name).css('display', 'none');
+    } else {
+        $("#upload_image_" + widget_name).css('display', 'block');
+    }
 }
 
 
@@ -73,8 +79,9 @@ function show_big_img(obj) {
 
 function delete_img(e) {
     var name = $(e).data('widgetname');
+    var maxcount = $(e).data('maxcount');
     $(e).closest('.selected-img').remove();
-    updateTextareaValue(name);
+    updateTextareaValue(name, maxcount);
 }
 
 document.addEventListener("keydown", function (event) {
