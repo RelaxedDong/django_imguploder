@@ -1,7 +1,51 @@
+function uploadImage(obj) {
+    var name = $(obj).data('widgetname');
+    var max_count = $(obj).data('max_count');
+    var formData = new FormData();
+    var files = $(obj)[0].files; // get img files
+    let selectedImgs = $('.' + name + '_values')
+    if (max_count > 0 && selectedImgs.length + files.length > max_count) {
+        files = Array.prototype.slice.call(files, 0, selectedImgs.length + files.length - max_count);
+    }
+    for (var i = 0; i < files.length; i++) {
+        formData.append(files[i].name, files[i]);
+    }
+    let upload_url = $('#multi_upload_url').val()
+    if (formData) {
+        // must add csrftoken
+        $.ajax({
+            url: upload_url,
+            dataType: 'json',
+            type: 'POST',
+            processData: false,
+            contentType: false,
+            data: formData,
+            async: false,
+            success: function (resp) {
+                console.log(resp)
+                // show uplaodes files
+                if (resp.error_msg) {
+                    alert("upload file error" + resp.error_msg);
+                    return
+                }
+                var image_list = resp.image_list;
+                for (i = 0; i < image_list.length; i++) {
+                    add_selected_img(image_list[i], name, max_count)
+                }
+                $(obj).val("");
+            },
+            error: function (error) {
+                alert("upload file error" + error);
+            }
+        })
+    }
+}
+
+
 function add_selected_img(src, widget_name, max_count) {
     $("#upload_image_" + widget_name).before("<div class=\"selected-img\">\n" +
-        "    <div class=\"deletelink delete_icon_image\" data-maxcount=\"" + max_count + "\" data-widgetname=\"" + widget_name + "\" title=\"删除图片\" onclick='delete_img(this)'></div>\n" +
-        "    <img class=\"widget_imgs " + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"待选图片\" onclick='show_big_img(this)'>\n" +
+        "    <div class=\"deletelink delete_icon_image\" data-maxcount=\"" + max_count + "\" data-widgetname=\"" + widget_name + "\" title=\"delete img\" onclick='delete_img(this)'></div>\n" +
+        "    <img class=\"widget_imgs " + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"choose imgs\" onclick='show_big_img(this)'>\n" +
         "</div>");
     updateTextareaValue(widget_name, max_count);
 }

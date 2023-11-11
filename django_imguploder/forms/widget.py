@@ -1,15 +1,11 @@
 import json
 
-from django.forms import ModelForm
+from django.forms import ModelForm, CharField
 from django.forms.widgets import Input
 
 
 class MultiImagesInputWidget(Input):
     template_name = 'admin/widgets/img_multi_upload.html'
-    input_type = "file"
-    accept = "image/*"
-    multiple = True
-    max_count = None
 
     class Media:
         css = {
@@ -23,13 +19,9 @@ class MultiImagesInputWidget(Input):
         )
 
     def get_context(self, name, value, attrs):
-        context = super(MultiImagesInputWidget, self).get_context(name, value ,attrs)
-        context.update({
-            'multiple': self.multiple,
-            'accept': self.accept,
-            'max_count': self.max_count if self.max_count else -1,
-            'input_type': self.input_type or "file",
-        })
+        context = super(MultiImagesInputWidget, self).get_context(name, value, attrs)
+        if not value:
+            return context
         try:
             context["widget"]['widget_img_urls'] = ",".join(json.loads(value))
         except:
@@ -37,17 +29,31 @@ class MultiImagesInputWidget(Input):
         return context
 
 
-class UploadImageForm(ModelForm):
+class MultiImageField(CharField):
+    widget = MultiImagesInputWidget
 
-    def clean(self):
-        cleaned_data = self.cleaned_data
-        for field_name, field in self.declared_fields.items():
-            if isinstance(field.widget, MultiImagesInputWidget):
-                if field.widget.multiple:
-                    imgs_str = self.cleaned_data.get(field_name)
-                    imgs = [img for img in imgs_str.split(",") if img] if imgs_str else []
-                    data = json.dumps(imgs)
-                else:
-                    data = self.cleaned_data.get(field_name) or ""
-                cleaned_data[field_name] = data
-        return cleaned_data
+    def __init__(self, max_count=None, input_type=None, accept="image/*", save_json_list=True, **kwargs):
+        self.accept = accept
+        self.input_type = input_type
+        self.max_count = max_count
+        # save_json_list: "['1.jpg', '2.jpg']"
+        # not save_json_list: 1.jpg,2.jpg
+        self.save_json_list = save_json_list
+        super().__init__(**kwargs)
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+        max_count = self.max_count if self.max_count else -1
+        attrs.update({
+            'multiple': bool(max_count > 1),
+            'accept': self.accept,
+            'max_count': max_count,
+            'input_type': self.input_type or "file",
+        })
+        return attrs
+
+    def to_python(self, value):
+        if self.save_json_list:
+            imgs = [img for img in value.split(",") if img] if value else []
+            value = json.dumps(imgs)
+        return value

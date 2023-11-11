@@ -1,4 +1,26 @@
-django_imguploder
+# django-imgwidget
+
+[![GitHub License](https://img.shields.io/github/license/RelaxedDong/django_imguploder)](https://opensource.org/licenses/MIT)
+[![PyPI Version](https://img.shields.io/pypi/v/django-imgwidget)](https://pypi.org/project/django-imgwidget)
+
+**django-imgwidget** is a Django package that provides easy and efficient image uploading in the backend. It supports single-image uploads as well as batch uploads for multiple images. The package comes with features like large image preview, image deletion, and image rotation preview.
+
+## Features
+
+- Convenient backend image uploading.
+- Single-image and batch upload support.
+- Large image preview with the ability to delete images.
+- Image rotation preview for a better viewing experience.
+- Keyboard shortcuts for enhanced user experience, including left and right arrow keys to switch preview images and ESC key to exit preview mode.
+
+## Installation
+
+Install the package using pip:
+
+```bash
+pip install django-imgwidget
+
+
 -----
 👍 后台上传图片
 
@@ -13,64 +35,75 @@ django_imguploder
     1.支持左右键切换预览图片
     
     2.支持ESC退出预览模式
+```
 
 🌈 效果图片
 
-![这是图片](example.png "Magic Gardens")
+![img_3.png](img_3.png)
 
-安装
+![img_1.png](img_1.png)!
+
+Installation
 -----
 `pip install django-imgwidget`
 
-`主页: https://pypi.org/project/django-imgwidget`
+`Homepage: https://pypi.org/project/django-imgwidget`
 
-步骤
+Steps
 -----
-- 在settings.py中加入 `django_imguploder`
+- Add `django_imguploder` to your settings.py
 
-- 配置上传图片路由
+- Configure the image upload route, name is `upload_image`
+
 ```python
 path("upload", ImageUploadView.as_view(), name='upload_image')
 ```
 
-- 编写视图函数 example
+- Write a view function.
+Need to return JsonResponse `code image_list error_msg`, if there are errors, return error_msg error prompt. example:
 ```python 
 class ImageUploadView(views.View):
     def post(self, request):
         files = request.FILES or {}
-        files = list(files.values())
-        image_list = []
-        for file in files:
-            img_url = FileUploadManager.upload(file)
-            if img_url:
-                image_list.append(img_url)
-        return JsonResponse({"code": code, 'msg': msg, 'data': {"image_list": image_list}})
+        image_list = [upload_img(file) for file in list(files.values())]
+        return JsonResponse({
+            "error_msg": "",
+            "image_list": image_list,
+        })
 ```
 
-- 使用组件 example
+- Use the component in admin.py
 
-models.py:
-```python 
-    imgs = models.TextField(default="", null=False, verbose_name='图片')
-    certificate_imgs = models.TextField(default="", verbose_name='认证图片') 
-```
-
-admin:
+models & admin:
 ```python
 class UploadImgsForm(ModelForm):
-    imgs = forms.CharField(label="图片", widget=MultiImagesInputWidget, required=False)
-    certificate_imgs = forms.CharField(label="认证图片", widget=MultiImagesInputWidget, required=False)
+    imgs = MultiImageField(label="imgs", max_count=13, required=False)
+    description_img = MultiImageField(label="description", max_count=1, required=False, save_json_list=False)
 
 
-class MyAdmin(admin.ModelAdmin):
-    ...
-    form = UploadImgsForm
+class CameraAdmin(admin.ModelAdmin):
+fieldsets = [
+    ('information', {'fields': (
+        ('imgs',),
+        ('description_img',),
+    )}),
+]
+form = UploadImgsForm
+
+result: imgs -> '["1.jpeg", "2.jpg"]', description -> description_img.jpeg
 ```
 
-- 如果想保存为json格式，例如：['111.jpg', '222.jpg']
-```
-def save_model(self, request, obj, form, change):
-    for img in ['imgs', 'certificate_imgs']:
-        setattr(obj, img, json.dumps(get_imgs_value(form.cleaned_data.get(img))))
-    return super(MyAdmin, self).save_model(request, obj, form, change)
+
+### Configuration：
+```html
+accept:
+
+config <input> accept
+
+max_count
+
+Description: Defines the maximum number of files that can be selected/uploaded using the file input.
+
+save_json_list:
+Description: Determines whether the uploaded file names are saved as a JSON-formatted list or string.
 ```
