@@ -5,7 +5,10 @@ function uploadImage(obj) {
     var files = $(obj)[0].files; // get img files
     let selectedImgs = $('.' + name + '_values')
     if (max_count > 0 && selectedImgs.length + files.length > max_count) {
-        files = Array.prototype.slice.call(files, 0, selectedImgs.length + files.length - max_count);
+        var excessCount = selectedImgs.length + files.length - max_count;
+        if (excessCount > 0) {
+            files = Array.prototype.slice.call(files, 0, files.length - excessCount);
+        }
     }
     for (var i = 0; i < files.length; i++) {
         formData.append(files[i].name, files[i]);
@@ -22,7 +25,6 @@ function uploadImage(obj) {
             data: formData,
             async: false,
             success: function (resp) {
-                console.log(resp)
                 // show uplaodes files
                 if (resp.error_msg) {
                     alert("upload file error" + resp.error_msg);
