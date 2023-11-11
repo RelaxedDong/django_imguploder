@@ -3,15 +3,14 @@
 [![GitHub License](https://img.shields.io/github/license/RelaxedDong/django_imguploder)](https://opensource.org/licenses/MIT)
 [![PyPI Version](https://img.shields.io/pypi/v/django-imgwidget)](https://pypi.org/project/django-imgwidget)
 
-**django-imgwidget** is a Django package that provides easy and efficient image uploading in the backend. It supports single-image uploads as well as batch uploads for multiple images. The package comes with features like large image preview, image deletion, and image rotation preview.
+**django-imgwidget** is a Django package that provides easy and efficient image uploading in the admin site. It supports single-image uploads as well as batch uploads for multiple images. The package comes with features like large image preview, image deletion, and image rotation preview.
 
 ## Features
-
-- Convenient backend image uploading.
+- Save as json or string to a field
 - Single-image and batch upload support.
 - Large image preview with the ability to delete images.
 - Image rotation preview for a better viewing experience.
-- Keyboard shortcuts for enhanced user experience, including left and right arrow keys to switch preview images and ESC key to exit preview mode.
+- Keyboard shortcuts for enhanced user experience.
 
 ## Installation
 
@@ -74,8 +73,13 @@ class ImageUploadView(views.View):
 
 - Use the MultiImageField in admin.py
 
-models & admin:
 ```python
+# models.py
+class MyModel(models.Model):
+    imgs = models.TextField(default=[], null=False, verbose_name='图片')
+    description = models.CharField(verbose_name="描述", null="", max_length=100)
+    
+# admin.py  
 class UploadImgsForm(ModelForm):
     imgs = MultiImageField(label="imgs", max_count=13, required=False)
     description_img = MultiImageField(label="description", max_count=1, required=False, save_json_list=False)
@@ -90,7 +94,7 @@ fieldsets = [
 ]
 form = UploadImgsForm
 
-result: imgs -> '["1.jpeg", "2.jpg"]', description -> description_img.jpeg
+# result: imgs -> '["1.jpeg", "2.jpg"]', description -> description_img.jpeg
 ```
 
 
