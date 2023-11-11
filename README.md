@@ -53,14 +53,14 @@ Steps
 -----
 - Add `django_imguploder` to your settings.py
 
-- Configure the image upload route, name is `upload_image`
+- Configure the image upload route, route name is `upload_image`
 
 ```python
 path("upload", ImageUploadView.as_view(), name='upload_image')
 ```
 
 - Write a view function.
-Need to return JsonResponse `code image_list error_msg`, if there are errors, return error_msg error prompt. example:
+Need to return JsonResponse `image_list error_msg`, if there are errors, return error_msg error prompt. example:
 ```python 
 class ImageUploadView(views.View):
     def post(self, request):
@@ -72,7 +72,7 @@ class ImageUploadView(views.View):
         })
 ```
 
-- Use the component in admin.py
+- Use the MultiImageField in admin.py
 
 models & admin:
 ```python
@@ -100,7 +100,7 @@ accept:
 
 config <input> accept
 
-max_count
+max_count:
 
 Description: Defines the maximum number of files that can be selected/uploaded using the file input.
 
