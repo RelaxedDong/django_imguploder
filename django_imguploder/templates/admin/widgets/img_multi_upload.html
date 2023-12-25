@@ -1,4 +1,8 @@
 {% load static %}
+<ul id="viewer_{{ widget.name }}">
+  <!-- Existing li elements may be here -->
+</ul>
+
 <div class="file-button addlink" id="upload_image_{{ widget.name }}">
     <input type="{{ widget.attrs.input_type }}"
            data-widgetname="{{ widget.name }}"

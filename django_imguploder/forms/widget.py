@@ -11,21 +11,35 @@ class MultiImagesInputWidget(Input):
         css = {
             "all": (
                 "admin/css/imgwidget.css",
+                "admin/css/viewer.css",
             )
         }
         js = (
             "admin/js/jquery.min.js",
             "admin/js/img_multi_upload.js",
+            "admin/js/viewer.min.js",
         )
+
+    def get_json_value(self, value):
+        """
+        :param value:
+        :return: is_json, value
+        """
+        try:
+            return True, json.loads(value)
+        except ValueError as e:
+            return False, value
 
     def get_context(self, name, value, attrs):
         context = super(MultiImagesInputWidget, self).get_context(name, value, attrs)
         if not value:
             return context
-        try:
+        # 判断是否是json
+        is_json, json_value = self.get_json_value(value)
+        if is_json:
             context["widget"]['widget_img_urls'] = ",".join(json.loads(value))
-        except:
-            pass
+        else:
+            context["widget"]['widget_img_urls'] = value
         return context
 
 

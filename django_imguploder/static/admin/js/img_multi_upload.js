@@ -45,10 +45,10 @@ function uploadImage(obj) {
 
 
 function add_selected_img(src, widget_name, max_count) {
-    $("#upload_image_" + widget_name).before("<div class=\"selected-img\">\n" +
-        "    <div class=\"deletelink delete_icon_image\" data-maxcount=\"" + max_count + "\" data-widgetname=\"" + widget_name + "\" title=\"delete img\" onclick='delete_img(this)'></div>\n" +
+    $("#upload_image_" + widget_name).before("<ul class=\"selected-img\">\n" +
+        "    <li class=\"deletelink delete_icon_image\" data-maxcount=\"" + max_count + "\" data-widgetname=\"" + widget_name + "\" title=\"delete img\" onclick='delete_img(this)'></li>\n" +
         "    <img class=\"widget_imgs " + widget_name + "_values\" src=\"" + src.replace("'", '').replace("'", '') + "\" alt=\"choose imgs\" onclick='show_big_img(this)'>\n" +
-        "</div>");
+        "</ul>");
     updateTextareaValue(widget_name, max_count);
 }
 
